@@ -1,0 +1,7 @@
+MAJOR_VERSION="${VERSION%.*}"
+MINOR_VERSION="${VERSION##*.}"
+if [[ ${MAJOR_VERSION} == ${LATEST} ]]
+then
+  export TAGS="latest ${TAGS}"
+fi
+shadow-text 3 "PHP ${VERSION}"

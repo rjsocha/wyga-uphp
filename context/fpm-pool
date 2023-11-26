@@ -1,0 +1,13 @@
+[uphp]
+listen = 9000
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 10
+security.limit_extensions = .php
+clear_env = no
+catch_workers_output = yes
+decorate_workers_output = no
+request_terminate_timeout = 60
+request_terminate_timeout_track_finished = yes
