@@ -2,8 +2,8 @@ ARG UPSTREAM
 ARG CONFIGUS=wyga/configus:latest
 FROM ${CONFIGUS} AS configus
 FROM ${UPSTREAM} AS mold
-WORKDIR /usr/local/bin
-RUN rm phpize pecl install-php-extensions peardev enable-php-extensions docker-php-source docker-php-entrypoint docker-php-ext-*
+RUN find /usr/local/bin -type f -not -name phar.phar -not -name phar -not -name php-config -not -name php -not -name pear
+RUN find /usr/local/bin -type f -not -name phar.phar -not -name phar -not -name php-config -not -name php -not -name pear -delete
 WORKDIR /config/php/etc
 RUN cp /usr/local/etc/pear.conf  .
 COPY php-fpm.conf .
