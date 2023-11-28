@@ -21,6 +21,7 @@ RUN echo -n "${PHP_VERSION}" >version
 WORKDIR /.entrypoint
 COPY --chmod=755 entrypoint.sh uphp
 WORKDIR /
+COPY --chmod=444 configus.meta /.metadata/configus
 COPY --from=configus --chmod=755 /client/config-service /sbin/config-service
 COPY --chmod=755 configus-config.sh /sbin/configus-config
 COPY --chmod=755 extension-config.sh /sbin/extension-config
