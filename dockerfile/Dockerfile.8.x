@@ -18,10 +18,12 @@ WORKDIR /config/php/fpm
 COPY fpm-pool pool
 WORKDIR /.metadata/php
 RUN echo -n "${PHP_VERSION}" >version
+RUN /usr/local/bin/php-config --extension-dir >extension-dir
 WORKDIR /.entrypoint
 COPY --chmod=755 entrypoint.sh uphp
 WORKDIR /
 COPY --chmod=444 configus.meta /.metadata/configus
+COPY --chmod=755 md-php /bin/.md
 COPY --from=configus --chmod=755 /client/config-service /sbin/config-service
 COPY --chmod=755 configus-config.sh /sbin/configus-config
 COPY --chmod=755 extension-config.sh /sbin/extension-config

@@ -1,5 +1,5 @@
 export NAME="uphp"
-UPSTREAMS="${UPSTREAMS:-wyga/php-upstream:8.0-fpm-alpine wyga/php-upstream:8.1-fpm-alpine wyga/php-upstream:8.2-fpm-alpine}"
+UPSTREAMS="${UPSTREAMS:-wyga/php-upstream:8.0-fpm-alpine wyga/php-upstream:8.1-fpm-alpine wyga/php-upstream:8.2-fpm-alpine wyga/php-upstream:8.3-fpm-alpine}"
 export BUILD_ARGS="UPSTREAM VERSION"
 export LATEST="8.2"
 export TAGS="@VERSION @MAJOR_VERSION"

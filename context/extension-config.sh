@@ -11,6 +11,7 @@ ENABLE="/config/php/extension/enable"
 [ ! -f "${INI}" ] || exit
 
 umask 0022
+EXT="$(.md extension-dir)"
 :>"${MOLD}"
 for config in $(find "${ENABLE}" -maxdepth 1 -type f)
 do
@@ -18,13 +19,10 @@ do
   do
     [ "${extension}" != "" ] || continue
     printf -- "%s" "${extension}" | grep -vq "^#" || continue
-    if [ ! -f "${PRESENT}/${extension}" ]
-    then
-      printf -- "WARNING: extension '%s' not found ...\n" "${extension}"
-      continue
-    fi
+    [ -f "${PRESENT}/${extension}" ] || continue
+    [ -f "${EXT}/${extension}.so" ] || continue
     cat "${PRESENT}/${extension}" >>"${MOLD}"
-   done < "${config}"
+  done < "${config}"
 done
 sort "${MOLD}" | uniq > "${INI}"
 rm "${MOLD}"
