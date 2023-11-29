@@ -13,7 +13,7 @@ then
 fi
 
 CONTEXT="context"
-CI_LOGS=".ci/log"
+CI_LOG=".artifacts/log"
 
 # Locate project root directory
 while [[ ! -f .gitlab-ci.yml ]]
@@ -103,12 +103,12 @@ done
 exec 101>&1 102>&2
 if [[ -z ${NOLOG:-} ]]
 then
-  if ! mkdir -p "${CI_LOGS}"
+  if ! mkdir -p "${CI_LOG}"
   then
     printf -- "ERROR: Unable to create LOG directory ...\n"
     exit 100
   fi
-  exec >"${CI_LOGS}/build-${NAME,,}.txt" 2>&1
+  exec >"${CI_LOG}/build-${NAME,,}.txt" 2>&1
 fi
 
 rc=0

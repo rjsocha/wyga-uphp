@@ -1,12 +1,19 @@
 #::PROJECT:CI:UPHP
 default:
+  image: ${CI_REGISTRY}/the-platform/container-images/docker-shell:latest
+  services:
+    - docker:dind
   tags:
-    - shell
+    - docker-in-docker
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_CREATE_CONTEXT: 1
 
 stages:
   - builder
 
-uPHP Builder:
+Image Builder:
   stage: builder
   variables:
     GIT_DEPTH: 1
@@ -18,9 +25,9 @@ uPHP Builder:
   after_script:
     - ci/ci-cleanup-environment
   artifacts:
-    name: "uphp-build-log"
+    name: "build-artifacts-${CI_PROJECT_NAME}"
     paths:
-      - .ci/
+      - .artifacts
     expire_in: 1 week
     when: always
   rules:
@@ -28,3 +35,4 @@ uPHP Builder:
     - if: $CI_PIPELINE_SOURCE == "pipeline"
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_COMMIT_TAG =~ /trigger/
+  retry: 1

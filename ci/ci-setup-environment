@@ -11,4 +11,3 @@ then
 fi
 docker run --quiet --privileged --rm tonistiigi/binfmt --install all &>/dev/null
 docker buildx inspect "${DOCKER_BUILDER}" --bootstrap || docker buildx create --use --bootstrap --name "${DOCKER_BUILDER}"
-mkdir -p ".ci/log"
