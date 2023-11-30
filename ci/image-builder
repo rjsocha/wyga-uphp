@@ -81,7 +81,7 @@ do
   TAG+=( "-t" "${image}" )
   if [[ -n ${DOCKER_IO_USER:-} ]] && [[ -n ${DOCKER_IO_PATH:-} ]]
   then
-    image="${DOCKER_IO_PATH}:${tag}"
+    image="${DOCKER_IO_PATH}/${NAME}:${tag}"
     DOCKERIO+=( "${image}" )
     TAG+=( "-t" "${image}" )
   fi
