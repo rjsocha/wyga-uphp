@@ -6,8 +6,8 @@ BASE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 export PATH="${BASE}/ci:${PATH}"
 
-for upstream in ${UPSTREAMS}
-do
+run_build() {
+local upstream="${1}"
   if pv="$(docker run --rm -q --pull always "${upstream}" php -r 'echo PHP_VERSION;')"
   then
     base="${upstream%%:*}"
@@ -28,9 +28,17 @@ do
     image-builder
   else
     printf -- "ERROR: Failed to retrieve PHP version"
-    shadow-text 3$UPSTREAM "FAILED"
+    shadow-text 3 "FAILED"
     exit 100
   fi
-done
+}
 
-#ci/image-builder
+if [[ -n ${1:-} ]]
+then
+  run_build "${1}"
+else
+  for upstream in ${UPSTREAMS}
+  do
+    run_build "${upstream}"
+  done
+fi

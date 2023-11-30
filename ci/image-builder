@@ -32,7 +32,7 @@ then
 fi
 export PATH="$(pwd)/ci:$(pwd):${PATH}"
 
-source "${NAME}.hook" 
+source "${NAME}.hook"
 
 DOCKERFILE="dockerfile/Dockerfile.${MAJOR_VERSION}"
 
@@ -79,9 +79,9 @@ do
   fi
   IMAGE+=( "${image}" )
   TAG+=( "-t" "${image}" )
-  if [[ -n ${DOCKER_IO_USER:-} ]]
+  if [[ -n ${DOCKER_IO_USER:-} ]] && [[ -n ${DOCKER_IO_PATH:-} ]]
   then
-    image="${CI_PROJECT_PATH}:${tag}"
+    image="${DOCKER_IO_PATH}:${tag}"
     DOCKERIO+=( "${image}" )
     TAG+=( "-t" "${image}" )
   fi
@@ -93,12 +93,14 @@ do
   printf -- " %s\n" "${image}"
 done
 
+[[ -z ${NOBUILD:-} ]] || exit 0
+
 ARGS=()
 for arg in ${BUILD_ARGS:-}
 do
   export $arg
   ARGS+=( "--build-arg" "${arg}" )
-done 
+done
 
 exec 101>&1 102>&2
 if [[ -z ${NOLOG:-} ]]
