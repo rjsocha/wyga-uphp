@@ -1,5 +1,5 @@
 ARG UPSTREAM
-ARG CONFIGUS=wyga/configus:latest
+ARG CONFIGUS=wyga/configus:DEBUG
 FROM ${CONFIGUS} AS configus
 FROM ${UPSTREAM} AS mold
 RUN find /usr/local/bin -type f -not -name phar.phar -not -name phar -not -name php-config -not -name php -not -name pear
