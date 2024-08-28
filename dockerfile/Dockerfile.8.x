@@ -30,12 +30,12 @@ COPY --chmod=755 extension-config.sh /sbin/extension-config
 COPY --chmod=755 xdebug-config.sh /sbin/xdebug-config
 COPY --chmod=755 timezone-config.sh /sbin/timezone-config
 COPY --chmod=755 home-config.sh /sbin/home-config
-COPY --chmod=755 seal-config.sh /sbin/seal-config
 COPY --chmod=755 container-config.sh /sbin/container-config
 COPY --chmod=755 health-check.sh /sbin/health-check
 COPY --chmod=755 php-fpm /sbin/php-fpm
 # Make sure www-data has UID/GID 33
-RUN deluser xfs && deluser www-data
+RUN deluser xfs || true
+RUN deluser www-data || true
 RUN addgroup -g 33 -S www-data && adduser -S -u 33 -G www-data -g "Web Runtime" -D -H -h /web www-data
 RUN find /etc -name "*-"  -delete -type f
 RUN rm -rf /usr/local/include /usr/local/php/man /usr/src

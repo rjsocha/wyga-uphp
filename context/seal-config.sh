@@ -1,3 +1,4 @@
 #!/bin/sh
 set -eu
-find /config -user $(id -u) -exec chmod a-w {} \;
+#This breaks restarts / docker engine upgrades
+#find /config -user $(id -u) -exec chmod a-w {} \;

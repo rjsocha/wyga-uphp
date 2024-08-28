@@ -5,13 +5,13 @@ INI="${PHP_INI_DIR}/extension.ini"
 PRESENT="/config/php/extension/present"
 ENABLE="/config/php/extension/enable"
 
-[ -w "${PHP_INI_DIR}" ] || exit 100
-[ -d "${ENABLE}" ] || exit
-[ -d "${PRESENT}" ] || exit
-[ ! -f "${INI}" ] || exit
+[ -w "${PHP_INI_DIR}" ] || exit 0
+[ -d "${ENABLE}" ] || exit 0
+[ -d "${PRESENT}" ] || exit 0
+# extension.ini exists - this is not critical - container restart
+[ ! -f "${INI}" ] || exit 0
 
 umask 0022
-EXT="$(.md extension-dir)"
 :>"${MOLD}"
 for config in $(find "${ENABLE}" -maxdepth 1 -type f)
 do
@@ -19,10 +19,13 @@ do
   do
     [ "${extension}" != "" ] || continue
     printf -- "%s" "${extension}" | grep -vq "^#" || continue
-    [ -f "${PRESENT}/${extension}" ] || continue
-    [ -f "${EXT}/${extension}.so" ] || continue
+    if [ ! -f "${PRESENT}/${extension}" ]
+    then
+      printf -- "WARNING: extension '%s' not found ...\n" "${extension}"
+      continue
+    fi
     cat "${PRESENT}/${extension}" >>"${MOLD}"
-  done < "${config}"
+   done < "${config}"
 done
 sort "${MOLD}" | uniq > "${INI}"
 rm "${MOLD}"
