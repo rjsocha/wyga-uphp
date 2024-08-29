@@ -13,9 +13,9 @@ ENABLE="/config/php/extension/enable"
 
 umask 0022
 :>"${MOLD}"
-for config in $(find "${ENABLE}" -maxdepth 1 -type f)
-do
-  while read extension
+
+if [ -n "${ENABLE_EXTENSTION-}" ]; then
+  for extension in ${ENABLE_EXTENSTION//,/ }
   do
     [ "${extension}" != "" ] || continue
     printf -- "%s" "${extension}" | grep -vq "^#" || continue
@@ -25,7 +25,22 @@ do
       continue
     fi
     cat "${PRESENT}/${extension}" >>"${MOLD}"
-   done < "${config}"
-done
+  done
+else
+  for config in $(find "${ENABLE}" -maxdepth 1 -type f)
+  do
+    while read extension
+    do
+      [ "${extension}" != "" ] || continue
+      printf -- "%s" "${extension}" | grep -vq "^#" || continue
+      if [ ! -f "${PRESENT}/${extension}" ]
+      then
+        printf -- "WARNING: extension '%s' not found ...\n" "${extension}"
+        continue
+      fi
+      cat "${PRESENT}/${extension}" >>"${MOLD}"
+     done < "${config}"
+  done
+fi
 sort "${MOLD}" | uniq > "${INI}"
 rm "${MOLD}"
