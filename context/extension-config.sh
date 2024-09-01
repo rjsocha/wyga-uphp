@@ -14,8 +14,8 @@ ENABLE="/config/php/extension/enable"
 umask 0022
 :>"${MOLD}"
 
-if [ -n "${ENABLE_EXTENSTION-}" ]; then
-  for extension in ${ENABLE_EXTENSTION//,/ }
+if [ -n "${EXTENSIONS-}" ]; then
+  for extension in ${EXTENSIONS//,/ }
   do
     [ "${extension}" != "" ] || continue
     printf -- "%s" "${extension}" | grep -vq "^#" || continue
