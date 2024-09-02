@@ -3,5 +3,4 @@ opcache
 mysqli
 intl
 gd
-mcrypt
 gettext
