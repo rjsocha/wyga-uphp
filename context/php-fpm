@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/local/sbin/php-fpm --nodaemonize --force-stderr --fpm-config /config/php/etc/php-fpm.conf "$@"

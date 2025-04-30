@@ -1,0 +1,123 @@
+#!/bin/bash
+set -eu
+set -o pipefail
+source "config.ci"
+
+BASE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+W=16
+
+if [[ -z ${UPSTREAM:-} ]]
+then
+  printf -- "ERROR: The UPSTREAM environmental variable not defined ...\n"
+  exit 100
+fi
+
+CONTEXT="context"
+CI_LOGS=".ci/log"
+
+# Locate project root directory
+while [[ ! -f .gitlab-ci.yml ]]
+do
+  cd ..
+  if [[ $(pwd) == "/" ]]
+  then
+    printf -- "ERROR: Unable to locate the project's root folder ...\n"
+    exit 100
+  fi
+done
+if ! grep -q "#::PROJECT:CI:${NAME^^}" ".gitlab-ci.yml"
+then
+  printf -- "ERROR: Unable to locate the project's root folder (incorrect .gitlab-ci.yml file) ...\n"
+  exit 100
+fi
+export PATH="$(pwd)/ci:$(pwd):${PATH}"
+
+source "${NAME}.hook" 
+
+DOCKERFILE="dockerfile/Dockerfile.${MAJOR_VERSION}"
+
+if ! [[ -d ${CONTEXT} ]]
+then
+  printf -- "ERROR: missing context directory: %s ...\n" "${CONTEXT}"
+  exit 100
+fi
+
+if ! [[ -s ${DOCKERFILE} ]]
+then
+  printf -- "ERROR: missing Dockerfile: %s ...\n" "${DOCKERFILE}"
+  exit 100
+fi
+
+printf -- "%-${W}.${W}s %s\n" "UPSTREAM:"   "${UPSTREAM}"
+printf -- "%-${W}.${W}s %s\n" "CONTEXT:"    "${CONTEXT}"
+printf -- "%-${W}.${W}s %s\n" "DOCKERFILE:" "${DOCKERFILE}"
+printf -- "%-${W}.${W}s %s\n" "PLATFORMS:"  "${PLATFORMS}"
+
+IMAGE=()
+DOCKERIO=()
+TAG=()
+
+for tag in ${TAGS}
+do
+  if [[ ${tag::1} == "@" ]]
+  then
+    tag="${tag:1}"
+    env="${tag}"
+    if ! [[ -v ${tag} ]]
+    then
+      printf -- "ERROR: undefined variable '%s' referenced as tag ...\n" "${tag}"
+      exit 201
+    fi
+    tag="${!tag}"
+    printf -- "%-${W}.${W}s %s\n" "${env}:"  "${tag}"
+  fi
+  if [[ -z ${CI_REGISTRY_IMAGE:-} ]]
+  then
+    image="${NAME}:${tag}"
+  else
+    image="${CI_REGISTRY_IMAGE}:${tag}"
+  fi
+  IMAGE+=( "${image}" )
+  TAG+=( "-t" "${image}" )
+  if [[ -n ${DOCKER_IO_USER:-} ]]
+  then
+    image="${CI_PROJECT_PATH}:${tag}"
+    DOCKERIO+=( "${image}" )
+    TAG+=( "-t" "${image}" )
+  fi
+done
+
+printf -- "Building:\n"
+for image in ${IMAGE[@]} ${DOCKERIO[@]}
+do
+  printf -- " %s\n" "${image}"
+done
+
+ARGS=()
+for arg in ${BUILD_ARGS:-}
+do
+  export $arg
+  ARGS+=( "--build-arg" "${arg}" )
+done 
+
+exec 101>&1 102>&2
+if [[ -z ${NOLOG:-} ]]
+then
+  if ! mkdir -p "${CI_LOGS}"
+  then
+    printf -- "ERROR: Unable to create LOG directory ...\n"
+    exit 100
+  fi
+  exec >"${CI_LOGS}/build-${NAME,,}.txt" 2>&1
+fi
+
+rc=0
+docker buildx build ${BUILDX_CONFIG[@]} ${TAG[@]} ${ARGS[@]} -f "${DOCKERFILE}" "${CONTEXT}" || rc=1
+exec 1>&101 2>&102
+if [[ ${rc} -eq 0 ]]
+then
+  shadow-text 0 "SUCCEEDED"
+else
+  shadow-text 6 "FAILED"
+  exit 10
+fi

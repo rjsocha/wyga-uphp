@@ -1,0 +1,6 @@
+#!/bin/sh
+METADATA="/.metadata"
+if [ -f "${METADATA}/${1:-}" ]
+then
+  exec cat "${METADATA}/${1}"
+fi

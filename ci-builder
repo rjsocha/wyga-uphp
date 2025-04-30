@@ -1,0 +1,41 @@
+#!/bin/bash
+set -eu
+set -o pipefail
+source "config.ci"
+BASE=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+export PATH="${BASE}/ci:${PATH}"
+
+for upstream in ${UPSTREAMS}
+do
+  if [[ -n ${CI_REGISTRY:-} ]] && [[ -n ${IMAGE_PATH} ]]
+  then
+    upstream="${CI_REGISTRY}/${IMAGE_PATH}:${upstream}"
+  else
+    upstream="wyga/php-upstream:${upstream}"
+  fi
+  printf -- "UPSTREAM: %s\n" "${upstream}"
+  if pv="$(docker run --rm -q --pull always "${upstream}" php -r 'echo PHP_VERSION;')"
+  then
+    base="${upstream%%:*}"
+    tag="${upstream%%*:}"
+    if [[ ${tag} =~ -fpm-alpine$ ]]
+    then
+      FLAVOR="fpm-alpine"
+    elif [[ ${tag} =~ -fpm$ ]]
+    then
+      FLAVOR="fpm"
+    else
+      printf -- "ERROR: unsupported PHP image flavor: '%s' ...\n" "${tag}"
+      exit 200
+    fi
+    export VERSION="${pv}"
+    export FLAVOR
+    export UPSTREAM="${base}:${VERSION}-${FLAVOR}"
+    image-builder
+  else
+    printf -- "ERROR: Failed to retrieve PHP version"
+    shadow-text 3 $UPSTREAM "FAILED"
+    exit 100
+  fi
+done
