@@ -1,4 +1,5 @@
 #::FPM_LISTEN=9000
+#::FPM_STATUS=
 #::FPM_PM=dynamic
 #::FPM_MAX_CHILDREN=20
 #::FPM_START_SERVERS=5
@@ -10,6 +11,8 @@
 #::FPM_DECORATE_WORKERS_OUTPUT=no
 #::FPM_REQUEST_TERMINATE_TIMEOUT=0
 #::FPM_REQUEST_TERMINATE_TIMEOUT_TRACK_FINISHED=yes
+#::FPM_ACCESS_LOG=
+#::FPM_ACCESS_FORMAT=%R %t \"%m %r%Q%q\" %s %f %{milliseconds}d ms
 [uphp]
 listen = {{FPM_LISTEN}}
 pm = {{FPM_PM}}
@@ -23,3 +26,11 @@ catch_workers_output = {{FPM_CATCH_WORKERS_OUTPUT}}
 decorate_workers_output = {{FPM_DECORATE_WORKERS_OUTPUT}}
 request_terminate_timeout = {{FPM_REQUEST_TERMINATE_TIMEOUT}}
 request_terminate_timeout_track_finished = {{FPM_REQUEST_TERMINATE_TIMEOUT_TRACK_FINISHED}}
+#IF FPM_STATUS#
+pm.status_listen = {{FPM_STATUS}}
+pm.status_path = /.status/fpm
+#FI FPM_STATUS#
+#IF FPM_ACCESS_LOG#
+access.log = {{FPM_ACCESS_LOG}}
+access.format = {{FPM_ACCESS_FORMAT}}
+#FI FPM_ACCESS_LOG#

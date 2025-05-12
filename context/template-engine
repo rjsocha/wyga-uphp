@@ -105,6 +105,26 @@ while read template; do
   config="${config//&/\\&}"
   set -- "$@" "-e" "s/{{${key}}}/${config}/g"
 done < "${INPUT}"
+
+#IF NOT EMPTY
+grep -o -E '^#IF [A-Z_]+#' "${PROFILES}/${SELECTED}" >"${INPUT}"
+while read ifnotempty; do
+  key="${ifnotempty:4}"
+  key="${key::-1}"
+  config_key="\${${key}}"
+  config_key_set="\${${key}+set}"
+  eval "config_set=${config_key_set}"
+  if [ -n "${config_set}" ]; then
+    eval "config=${config_key}"
+  else
+    config=""
+  fi
+  if [ -n "${config}" ]; then
+    set -- "$@" "-e" "/^#IF ${key}#/d" "-e" "/^#FI ${key}#/d"
+  else
+    set -- "$@" "-e" "/#IF ${key}#/,/#FI $key#/d"
+  fi
+done < "${INPUT}"
 sed -i -e "s/{{LISTEN}}/${LISTEN-8080}/g" "$@" "${TEMPLATE}"
 if [ "${RENDER}" = "1" ]; then
   cat "${TEMPLATE}"
