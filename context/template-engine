@@ -1,0 +1,113 @@
+#!/bin/sh
+set -eu
+PROFILES="/config/php/profile"
+TEMPLATE="/dev/shm/template.result.$$"
+INPUT="/dev/shm/template.input.$$"
+
+cleanup() {
+  local rc=$?
+  if [ -f "${TEMPLATE}" ]; then
+    rm -- "${TEMPLATE}" || true
+  fi
+  if [ -f "${INPUT}" ]; then
+    rm -- "${INPUT}" || true
+  fi
+  exit "${rc}"
+}
+
+trap cleanup EXIT
+
+show_vars() {
+local selected="${1}"
+  if [ ! -f "${PROFILES}/${selected}" ]; then
+    printf -- "template-engine: profile %s not found ...\n" "${selected}"
+    exit 1
+  fi
+  printf -- "PROFILE: %s\n" "${selected}"
+  printf -- "%-48.48s %-30.30s %s\n" "ENV" "DEFAULT" "VALUE"
+  printf -- "-------------------------------------------------------------------------------------\n"
+  grep -E '^#::[A-Z_]+=.*$' "${PROFILES}/${selected}" | cut -c 4- | while read template; do
+    key="$(echo -n "${template}" | awk -F= '{print $1}')"
+    val="$(echo -n "${template}" | awk -F= '{print $2}')"
+    config_key="\${${key}}"
+    config_key_set="\${${key}+set}"
+    eval "config_set=${config_key_set}"
+    if [ -n "${config_set}" ]; then
+      eval "config=${config_key}"
+    else
+     config="${val}"
+    fi
+    printf -- "%-48.48s %-30.30s %s\n" "${key}" "${val}" "${config}"
+  done
+}
+
+list_profiles() {
+  local cut=$(expr "${#PROFILES}" + 2)
+  find "${PROFILES}" -mindepth 2 -type f | cut -c "${cut}-" | sort
+  find "${PROFILES}" -mindepth 1 -maxdepth 1 -type f | cut -c "${cut}-" | sort
+}
+
+if [ -n "${1-}" ]; then
+  SELECTED="$1"
+elif [ -n "${PROFILE-}" ]; then
+  SELECTED="vars:${PROFILE}"
+else
+  exit 200
+fi
+
+FINAL="${2-}"
+
+if [ "${SELECTED}" = "list" ] || [ "${SELECTED}" = "ls" ]; then
+  list_profiles
+  exit 0
+fi
+
+if [ "${SELECTED:0:5}" = "vars:" ]; then
+  show_vars "${SELECTED:5}"
+  exit 0
+fi
+
+SHOW=0
+RENDER=0
+if [ "${SELECTED:0:4}" = "use:" ]; then
+  SELECTED="${SELECTED:4}"
+elif [ "${SELECTED:0:5}" = "show:" ]; then
+  SELECTED="${SELECTED:5}"
+  SHOW=1
+elif [ "${SELECTED:0:7}" = "render:" ]; then
+  SELECTED="${SELECTED:7}"
+  RENDER=1
+fi
+
+[ -f "${PROFILES}/${SELECTED}" ] || exit 1
+
+if [ "${SHOW}" = "1" ]; then
+  cat "${PROFILES}/${SELECTED}"
+  exit 0
+fi
+
+grep -v -E '^#::[A-Z_]+=.*$' "${PROFILES}/${SELECTED}" >"${TEMPLATE}"
+grep -E '^#::[A-Z_]+=.*$' "${PROFILES}/${SELECTED}" | cut -c 4- >"${INPUT}"
+set --
+while read template; do
+  key="$(echo -n "${template}" | awk -F= '{print $1}')"
+  val="$(echo -n "${template}" | awk -F= '{print $2}')"
+  config_key="\${${key}}"
+  config_key_set="\${${key}+set}"
+  eval "config_set=${config_key_set}"
+  if [ -n "${config_set}" ]; then
+    eval "config=${config_key}"
+  else
+   config="${val}"
+  fi
+  config="${config//\\/\\\\}"
+  config="${config//\//\\/}"
+  config="${config//&/\\&}"
+  set -- "$@" "-e" "s/{{${key}}}/${config}/g"
+done < "${INPUT}"
+sed -i -e "s/{{LISTEN}}/${LISTEN-8080}/g" "$@" "${TEMPLATE}"
+if [ "${RENDER}" = "1" ]; then
+  cat "${TEMPLATE}"
+elif [ -n "${FINAL-}" ]; then
+  mv -f -- "${TEMPLATE}" "${FINAL}"
+fi

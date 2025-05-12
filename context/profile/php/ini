@@ -1,0 +1,200 @@
+#::PHP_MEMORY_LIMIT=128M
+#::PHP_POST_MAX_SIZE=64M
+#::PHP_UPLOAD_MAX_FILESIZE=64M
+#::PHP_MAX_FILE_UPLOADS=20
+#::PHP_SHORT_OPEN_TAG=On
+#::PHP_EXPOSE_PHP=Off
+#::PHP_DATE_TIMEZONE=UTC
+#::PHP_ERROR_REPORTING=E_ALL & ~E_DEPRECATED
+#::PHP_LOG_ERRORS=On
+#::PHP_ERROR_LOG=/proc/self/fd/2
+#::PHP_DISPLAY_ERRORS=Off
+#::PHP_DISPLAY_STARTUP_ERRORS=Off
+#::PHP_MAX_EXECUTION_TIME=30
+#::PHP_MAX_INPUT_TIME=60
+#::PHP_MAX_INPUT_VARS=1000
+#::PHP_OUTPUT_BUFFERING=4096
+#::PHP_IMPLICIT_FLUSH=Off
+#::PHP_DISABLE_FUNCTIONS=
+#::PHP_IGNORE_USER_ABORT=Off
+#::PHP_AUTO_PREPEND_FILE=
+#::PHP_AUTO_APPEND_FILE=
+#::PHP_FILE_UPLOADS=On
+#::PHP_UPLOAD_TMP_DIR=
+#::PHP_ALLOW_URL_FOPEN=Off
+#::PHP_SESSION_SAVE_PATH=
+#::PHP_SESSION_NAME=PHPSESSID
+#::PHP_OPCACHE_ENABLE=On
+[PHP]
+engine = On
+short_open_tag = {{PHP_SHORT_OPEN_TAG}}
+precision = 14
+output_buffering = {{PHP_OUTPUT_BUFFERING}}
+zlib.output_compression = Off
+implicit_flush = {{PHP_IMPLICIT_FLUSH}}
+unserialize_callback_func =
+serialize_precision = -1
+disable_functions = {{PHP_DISABLE_FUNCTIONS}}
+disable_classes =
+ignore_user_abort = {{PHP_IGNORE_USER_ABORT}}
+zend.enable_gc = On
+zend.exception_ignore_args = On
+zend.exception_string_param_max_len = 0
+expose_php = {{PHP_EXPOSE_PHP}}
+max_execution_time = {{PHP_MAX_EXECUTION_TIME}}
+max_input_time = {{PHP_MAX_INPUT_TIME}}
+max_input_vars = {{PHP_MAX_INPUT_VARS}}
+memory_limit = {{PHP_MEMORY_LIMIT}}
+error_reporting = {{PHP_ERROR_REPORTING}}
+display_errors = {{PHP_DISPLAY_ERRORS}}
+display_startup_errors = {{PHP_DISPLAY_STARTUP_ERRORS}}
+log_errors = {{PHP_LOG_ERRORS}}
+ignore_repeated_errors = Off
+ignore_repeated_source = Off
+report_memleaks = On
+error_log = {{PHP_ERROR_LOG}}
+variables_order = "GPCS"
+request_order = "GP"
+register_argc_argv = Off
+auto_globals_jit = On
+post_max_size = {{PHP_POST_MAX_SIZE}}
+auto_prepend_file = {{PHP_AUTO_PREPEND_FILE}}
+auto_append_file = {{PHP_AUTO_APPEND_FILE}}
+default_mimetype = "text/html"
+default_charset = "UTF-8"
+doc_root =
+user_dir =
+enable_dl = Off
+cgi.force_redirect = 1
+fastcgi.logging = 0
+file_uploads = {{PHP_FILE_UPLOADS}}
+upload_tmp_dir = {{PHP_UPLOAD_TMP_DIR}}
+upload_max_filesize = {{PHP_UPLOAD_MAX_FILESIZE}}
+max_file_uploads = {{PHP_MAX_FILE_UPLOADS}}
+allow_url_fopen = {{PHP_ALLOW_URL_FOPEN}}
+allow_url_include = Off
+default_socket_timeout = 60
+
+[CLI Server]
+cli_server.color = On
+
+[Date]
+date.timezone = {{PHP_DATE_TIMEZONE}}
+
+[MySQLi]
+mysqli.max_persistent = -1
+mysqli.allow_persistent = On
+mysqli.max_links = -1
+mysqli.default_port = 3306
+mysqli.default_socket =
+mysqli.default_host =
+mysqli.default_user =
+mysqli.default_pw =
+
+[mysqlnd]
+mysqlnd.collect_statistics = On
+mysqlnd.collect_memory_statistics = Off
+
+[PostgreSQL]
+pgsql.allow_persistent = On
+pgsql.auto_reset_persistent = Off
+pgsql.max_persistent = -1
+pgsql.max_links = -1
+pgsql.ignore_notice = 0
+pgsql.log_notice = 0
+
+[bcmath]
+bcmath.scale = 0
+
+[browscap]
+;browscap = extra/browscap.ini
+
+[Session]
+session.save_handler = files
+session.save_path = {{PHP_SESSION_SAVE_PATH}}
+session.use_strict_mode = 0
+session.use_cookies = 1
+;session.cookie_secure =
+session.use_only_cookies = 1
+session.name = {{PHP_SESSION_NAME}}
+session.auto_start = 0
+session.cookie_lifetime = 0
+session.cookie_path = /
+session.cookie_domain =
+session.cookie_httponly =
+session.cookie_samesite =
+session.serialize_handler = php
+session.gc_probability = 1
+session.gc_divisor = 1000
+session.gc_maxlifetime = 1440
+session.referer_check =
+session.cache_limiter = nocache
+session.cache_expire = 180
+session.use_trans_sid = 0
+session.trans_sid_tags = "a=href,area=href,frame=src,form="
+;session.trans_sid_hosts=""
+;session.upload_progress.enabled = On
+;session.upload_progress.cleanup = On
+;session.upload_progress.prefix = "upload_progress_"
+;session.upload_progress.name = "PHP_SESSION_UPLOAD_PROGRESS"
+;session.upload_progress.freq =  "1%"
+;session.upload_progress.min_freq = "1"
+;session.lazy_write = On
+
+[Assertion]
+zend.assertions = -1
+
+[soap]
+soap.wsdl_cache_enabled=1
+soap.wsdl_cache_dir="/tmp"
+soap.wsdl_cache_ttl=86400
+soap.wsdl_cache_limit = 5
+
+[opcache]
+opcache.enable={{PHP_OPCACHE_ENABLE}}
+;opcache.enable_cli=0
+;opcache.memory_consumption=128
+;opcache.interned_strings_buffer=8
+;opcache.max_accelerated_files=10000
+;opcache.max_wasted_percentage=5
+;opcache.use_cwd=1
+;opcache.validate_timestamps=1
+;opcache.revalidate_freq=2
+;opcache.revalidate_path=0
+;opcache.save_comments=1
+;opcache.record_warnings=0
+;opcache.enable_file_override=0
+;opcache.optimization_level=0x7FFFBFFF
+;opcache.dups_fix=0
+;opcache.blacklist_filename=
+;opcache.max_file_size=0
+;opcache.force_restart_timeout=180
+;opcache.error_log=
+;opcache.log_verbosity_level=1
+;opcache.preferred_memory_model=
+;opcache.protect_memory=0
+;opcache.restrict_api=
+;opcache.mmap_base=
+;opcache.cache_id=
+;opcache.file_cache=
+;opcache.file_cache_only=0
+;opcache.file_cache_consistency_checks=1
+;opcache.huge_code_pages=0
+;opcache.validate_permission=0
+;opcache.validate_root=0
+;opcache.opt_debug_level=0
+;opcache.preload=
+;opcache.preload_user=
+;opcache.file_update_protection=2
+;opcache.lockfile_path=/tmp
+
+[curl]
+;curl.cainfo =
+
+[openssl]
+;openssl.cafile=
+;openssl.capath=
+
+[ffi]
+;ffi.enable=preload
+;ffi.preload=
