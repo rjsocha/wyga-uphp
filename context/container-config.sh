@@ -6,3 +6,4 @@ configus-config
 extension-config
 timezone-config
 xdebug-config
+profile-config
