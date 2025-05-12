@@ -52,7 +52,6 @@ COPY profile/ /config/php/profile/
 
 FROM scratch
 COPY --from=mold / /
-WORKDIR /app
 ENV PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 ENV PHPRC=/config/php/main
 ENV PHP_INI_DIR=/config/php/ini
