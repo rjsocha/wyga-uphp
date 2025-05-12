@@ -2,8 +2,8 @@
 set -eu
 umask 0022
 home-config
-configus-config
 extension-config
+configus-config
+profile-config
 timezone-config
 xdebug-config
-profile-config
