@@ -107,7 +107,7 @@ while read template; do
 done < "${INPUT}"
 
 #IF NOT EMPTY
-grep -o -E '^#IF [A-Z_]+#' "${PROFILES}/${SELECTED}" >"${INPUT}"
+grep -o -E '^#IF [A-Z_]+#' "${PROFILES}/${SELECTED}" >"${INPUT}" || true
 while read ifnotempty; do
   key="${ifnotempty:4}"
   key="${key::-1}"
