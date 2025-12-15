@@ -106,7 +106,7 @@ while read template; do
   set -- "$@" "-e" "s/{{${key}}}/${config}/g"
 done < "${INPUT}"
 
-#IF NOT EMPTY
+#IF KEY-NOT-EMPTY#
 grep -o -E '^#IF [A-Z_]+#' "${PROFILES}/${SELECTED}" >"${INPUT}" || true
 while read ifnotempty; do
   key="${ifnotempty:4}"
@@ -114,10 +114,9 @@ while read ifnotempty; do
   config_key="\${${key}}"
   config_key_set="\${${key}+set}"
   eval "config_set=${config_key_set}"
+  config=""
   if [ -n "${config_set}" ]; then
     eval "config=${config_key}"
-  else
-    config=""
   fi
   if [ -n "${config}" ]; then
     set -- "$@" "-e" "/^#IF ${key}#/d" "-e" "/^#FI ${key}#/d"
