@@ -8,6 +8,6 @@ stages:
   - image-builder
 
 uPHP Builder:
-  stage: image-builder
+  extends: .ci:image-builder
   script:
     - ci-builder
